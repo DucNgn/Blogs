@@ -1,8 +1,11 @@
-# Deploy an API service with FastAPI, Docker and Heroku Part. 1
+# Deploy an API service with FastAPI, Docker and Heroku (Part. 1)
 
 # Plan:
 
-In this tutorial, we will deploy an API service using FastAPI, Docker and Heroku. More specifically, we'll start by coding our API service with Python and FastAPI. Then we continue by containerizing the app with Docker. Finally, we deploy the container to Heroku Container Registry.
+In this tutorial serie, we will deploy an API service using FastAPI, Docker and Heroku.
+
+- In Part 1, we start by coding our API service with Python and FastAPI as well as setting up the directory.
+- Part 2, we continue by containerizing the app with Docker and deploy the container to Heroku Container Registry for serving to the public.
 
 _Bonus at the end:_ Set up an end-to-end pipeline for testing and auto deploy using GitHub Actions
 
@@ -46,13 +49,13 @@ Skip this step if you already knew what to do :wink:
 
 - For this tutorial, you can download the data of dog facts [here](https://github.com/DukeNgn/Dog-facts-API/blob/master/data.json), and put it in the same level of the main directory (this was the dataset I used for my own Dog-facts-API v1)
 
-- A common practice for working in a python project is creating a virtual environment for the project. If you prefer [poetry](https://python-poetry.org/), it has its own command to create virtual environment. Else, you can run this command to create a virtual environment:
+- A common practice for working in a python project is creating a virtual environment for the project. If you prefer [poetry](https://python-poetry.org/), it has its own command. Else, you can run this command in your terminal:
 
   ```
   python -m venv venv
   ```
 
-  This create a folder called `venv` in your directory. This folder hosts the virtual environment for your app.
+  This creates a folder called `venv` in your directory. This folder hosts the virtual environment for your app.
 
   > **Note:** Make sure your python version is python 3. On some Unix environments, you might need to use `python3` instead depends on your python set up.
 
@@ -98,8 +101,8 @@ Skip this step if you already knew what to do :wink:
 
   ```
 
-  - `app = FastAPI()` initializes the FastAPI object for us to use throughout the app. This is the main component for creating routes.
-  - `@app.get("/")` here we're telling fast api how to serve all `GET` requests that start with `/` with the below `home()` function. Note that `GET` is only one of several operations supported by FastAPI, read more about others [here](https://fastapi.tiangolo.com/tutorial/first-steps/#operation)
+  - `app = FastAPI()` initializes the FastAPI object for us to use throughout the app.
+  - `@app.get("/")` instructs fast api to use the `home()` function to handle all `GET` requests that start with `/`. Note that `GET` is only one of several operations supported by FastAPI, read more about others [here](https://fastapi.tiangolo.com/tutorial/first-steps/#operation)
 
   ```
   async def home():
@@ -108,15 +111,15 @@ Skip this step if you already knew what to do :wink:
 
   - This function handles any request to this endpoint.
 
-  We will definitely have more endpoints for our API service, but all will follow the same format as this block of code.
+  We will definitely have more endpoints for our API service, but all will follow the same format as this code block.
 
-- Go ahead and start the live server by:
+- Start the live server by:
 
   ```
   uvicorn main:app --reload
   ```
 
-  (the `--reload` flag here is for continuous rebuild as we change the file.)
+  (the `--reload` flag here is for continuous rebuild as we update the project.)
 
 - You should see something like this:
 
@@ -136,11 +139,11 @@ Skip this step if you already knew what to do :wink:
 
   Well done! you've created the very first API endpoint for your application! Any request in your local machine heads to this link will get `{"message": "Welcome to Dog Facts API!"}` as a response.
 
-- If you head to `http://127.0.0.1:8000/docs` now, you will see an auto-generated documentation of your API. You can see what endpoints are currently available and you can even make test request with it. Pretty cool, right, right ??!!
+- If you go to `{your-url}/docs` now, there should be an auto-generated documentation of your API. You can see all the available endpoints in the project and you can even make requests with it. Pretty cool, right, right ??!!
 
 # Build the service
 
-- Now go ahead and create a folder called `v1`. We may have more versions of the API service in the future, so naming this version `v1` and host all methods of v1 in this folder would help your clients to distinguise what features were introduced in which version.
+- Now go ahead and create a folder called `v1`. We may have more versions of the API service in the future, so we should have a naming convention to organize the folders.
 - Inside `v1`, create another folder, named `routers`. This folder hosts the code for our endpoints.
 - Create `facts.py` in `routers` for all endpoints related to dog-facts.
 - The directory now looks like this:
@@ -151,7 +154,9 @@ Skip this step if you already knew what to do :wink:
   │       └── facts.py
   ```
 
-- In `facts.api`, we create our first `GET` endpoint, which will serve dog facts to clients.
+  **Note:** you're free to use other coding organization. However, this is the set up I find the most convenient personally for scaling up.
+
+- In `facts.api`, we create our `GET` endpoint which serves dog facts to clients.
 
   ```python
   import json
@@ -198,9 +203,9 @@ Skip this step if you already knew what to do :wink:
   )
   ```
 
-  > You can think of `APIRouter` as a mini `FastAPI` class (from the official document)
+  > You can think of `APIRouter` as a mini `FastAPI` class (official documentation)
 
-  This creates a router for our app. All request with prefix `/v1/facts` should be sent to this router for handling. That means it matches with URLs such as `http://127.0.0.1:8000/v1/facts/`
+  This creates a router for our app. All request with prefix `/v1/facts` should be sent to this router for handling. That means it matches with URLs such as `http://127.0.0.1:8000/v1/facts/`.
   The default response in this route is a `404` error in case the request does not match any defined endpoints here.
 
   - Extract data from the data json file:
@@ -214,7 +219,7 @@ Skip this step if you already knew what to do :wink:
       return data, num_of_entry
   ```
 
-  This part basically perfoms a I/O operation to read the data file, then shuffle it and return back the data itself in a `dict` form and a variable called `num_of_entry` which is the total number of entries there're in data file.
+  This part perfoms a simple I/O operation to read the data file from json, then shuffles it and return back the data in as a `dict` along with a variable `num_of_entry` which is the total number of entries there're in data file.
 
   - Create GET endpoint:
 
@@ -224,7 +229,7 @@ Skip this step if you already knew what to do :wink:
 
   This creates a GET end point with variable `number`. Keep in mind here that we're only using the route `/{number}`, but in fact, the full route should be: `http://127.0.0.1:8000/v1/facts/{number}`. However, the first part was prefixed when we created the router so we don't need to worry about it.
 
-  - The function takes an argument `number` which is basically the number that was passed in from the request `/{number}`. It then calls the support function `get_data()` to extract the data from json file and get the total of entries there're.
+  - The function takes an argument `number` which is the number that was passed in from the request URL: `/{number}`. It then calls the support function `get_data()` to extract the data from json file.
 
   ```python
   async def get_facts(number: int) -> dict:
@@ -232,7 +237,7 @@ Skip this step if you already knew what to do :wink:
 
   ```
 
-  - Next, we have a condition to check if the number user requested is invalid (either less or equal than 0 or greater than the number of entries we have)
+  - Next, we have a condition to check if the number user requested is invalid (either less/equal than 0 or greater than the number of entries we have)
 
   ```python
   if number <= 0 or number > num_of_entry:
@@ -247,12 +252,12 @@ Skip this step if you already knew what to do :wink:
       )
   ```
 
-  - Make a test endpoint:
+  - Make a test request using the interactive UI from FastAPI:
     ![Test get dog facts](./test_GET.png)
 
-* Similarly, we add one more endpoint for the ability to update new entry for our service.
+* Similarly, we add one more endpoint for updating new entry for our service.
 
-  - First, we need to create a simple class to hold the new fact:
+  - First, we create a simple class to hold the new fact:
 
   ```python
   class Fact(BaseModel):
@@ -261,9 +266,9 @@ Skip this step if you already knew what to do :wink:
       description: str
   ```
 
-  This class is simple enough that you might not need it. However, it's a good practice to represents the object client uploads by a class.
+  This class is simple enough that you _might_ not need it. However, it's a good practice to represents the object client uploads by a class.
 
-  - Next, create the route, but this time with `POST` method
+  - Next, create the route, but this time with `POST` method since we're accepting new fact coming in from the client.
 
   ```python
   def update_data(new_data: List[dict]) -> None:
@@ -291,10 +296,10 @@ Skip this step if you already knew what to do :wink:
   ```
 
   - `update_data()` is used to add a new entry to the data file.
-  - `is_duplicate()` to check if the entry already existed in data. We don't want to add another fact that already existed in our data.
-  - `@router.post("/new")` Notices that we're using a different operation this time. This is a `post` method, it requires the client to send data along with the request.
-  - `async def create_fact(entry: Fact, x_token: str = Header(...)) -> Fact:` This means we read the request body from client and it is passed to the function as the parameter `entry`. The second parameter is the `x-token` we're expecting from the request. This token is used to verify if the request should be processed. The reason behind is this method is quite dangerous as it can modify our data. so we definitely want to filter out all the unauthorized request.
-  - We then check if the passing token is valid:
+  - `is_duplicate()` checks if the entry already existed in data. We don't want to add another fact that already existed.
+  - `@router.post("/new")` Notices that we're using a different operation this time. This is a `post` method, it requires the client to send data in the request body.
+  - `async def create_fact(entry: Fact, x_token: str = Header(...)) -> Fact:` The first parameter `entry` is required to be the content of the request body from clients. The second parameter is the `x-token` we're expecting from the request. This token is used authorize the request. The reason behind this is POST method usually modify our data, so we want to filter out all the unauthorized requests.
+  - We then check if the passing token is valid. If not, we raise an exception to notify the client side.
     ```python
     if x_token != SECRET_TOKEN:
           raise HTTPException(status_code=400, detail="X-Token header invalid")
@@ -313,4 +318,8 @@ Skip this step if you already knew what to do :wink:
 
     If we know that the new fact is a duplicate, we raise an HTTP Exception immediately with code `400` (Bad request). Else, we append the new fact to our data and update the data file. Finally, we return the entry itself to let the client know that the request was successful.
 
-*
+# End
+
+That concludes part 1 of the tutorial to deploy an API service using FastAPI. FastAPI is gaining popularity recent days. It's now extremely valuable knowing how to quickly implement an API service either for your back-end or as a public API.
+
+In part 2 of this tutorial, we will do some DevOps with Docker and deploy to Heroku for public usage.
