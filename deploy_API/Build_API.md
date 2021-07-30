@@ -1,13 +1,14 @@
 # Deploy an API service with FastAPI, Docker and Heroku (Part. 1)
 
-# Plan:
 
-In this tutorial serie, we will deploy an API service using FastAPI, Docker and Heroku.
+# Introduction:
+FastAPI is a modern, fast and highly performant web framework for building APIs using Python.
+It also is quite beginner friendly since you don't need to set up many things to get started for a FastAPI project.
+In this tutorial, we will start from scratch, set up the project, then we will create our API endpoints for 2 methods: GET and POST.
+In part 2 of the tutorial, we will continue by containerizing the app with Docker and deploy the container to Heroku Container Registry for serving to the public.
 
-- In Part 1, we start by coding our API service with Python and FastAPI as well as setting up the directory.
-- Part 2, we continue by containerizing the app with Docker and deploy the container to Heroku Container Registry for serving to the public.
+Requirements for this tutorial is just some basic knowledge with Python Programming and some understanding of APIs.
 
-_Bonus at the end:_ Set up an end-to-end pipeline for testing and auto deploy using GitHub Actions
 
 # Set up
 
@@ -42,6 +43,7 @@ Skip this step if you already knew what to do :wink:
       ```txt
       fastapi
       uvicorn
+      python-dotenv
       ```
 
     - `main.py`: the main python script to serve requests.
@@ -154,7 +156,7 @@ Skip this step if you already knew what to do :wink:
   │       └── facts.py
   ```
 
-  **Note:** you're free to use other coding organization. However, this is the set up I find the most convenient personally for scaling up.
+  **Note:** Fell free to use other coding organization. However, this is the set up I find the most convenient for scaling up.
 
 - In `facts.api`, we create our `GET` endpoint which serves dog facts to clients.
 
@@ -219,7 +221,7 @@ Skip this step if you already knew what to do :wink:
       return data, num_of_entry
   ```
 
-  This part perfoms a simple I/O operation to read the data file from json, then shuffles it and return back the data in as a `dict` along with a variable `num_of_entry` which is the total number of entries there're in data file.
+  This part perfoms a simple I/O operation to read the data file from json, then shuffles it and returns back the data in as a `dict` along with a variable `num_of_entry` which is the total number of entries there're in data file.
 
   - Create GET endpoint:
 
@@ -296,7 +298,7 @@ Skip this step if you already knew what to do :wink:
   ```
 
   - `update_data()` is used to add a new entry to the data file.
-  - `is_duplicate()` checks if the entry already existed in data. We don't want to add another fact that already existed.
+  - `is_duplicate()` checks if the entry already existed in data. We don't want to add another fact that simply is a duplicate.
   - `@router.post("/new")` Notices that we're using a different operation this time. This is a `post` method, it requires the client to send data in the request body.
   - `async def create_fact(entry: Fact, x_token: str = Header(...)) -> Fact:` The first parameter `entry` is required to be the content of the request body from clients. The second parameter is the `x-token` we're expecting from the request. This token is used authorize the request. The reason behind this is POST method usually modify our data, so we want to filter out all the unauthorized requests.
   - We then check if the passing token is valid. If not, we raise an exception to notify the client side.
@@ -318,8 +320,7 @@ Skip this step if you already knew what to do :wink:
 
     If we know that the new fact is a duplicate, we raise an HTTP Exception immediately with code `400` (Bad request). Else, we append the new fact to our data and update the data file. Finally, we return the entry itself to let the client know that the request was successful.
 
-# End
+# Conclusion
 
-That concludes part 1 of the tutorial to deploy an API service using FastAPI. FastAPI is gaining popularity recent days. It's now extremely valuable knowing how to quickly implement an API service either for your back-end or as a public API.
-
-In part 2 of this tutorial, we will do some DevOps with Docker and deploy to Heroku for public usage.
+That concludes part 1 of the tutorial to deploy an API service using FastAPI. Now, you have an API service that is ready to be deployed.
+In part 2 of this tutorial, we will do some DevOps with Docker and deploy the API to Heroku for public usage.
