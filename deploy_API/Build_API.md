@@ -300,7 +300,7 @@ Skip this step if you already knew what to do :wink:
   - `update_data()` is used to add a new entry to the data file.
   - `is_duplicate()` checks if the entry already existed in data. We don't want to add another fact that simply is a duplicate.
   - `@router.post("/new")` Notices that we're using a different operation this time. This is a `post` method, it requires the client to send data in the request body.
-  - `async def create_fact(entry: Fact, x_token: str = Header(...)) -> Fact:` The first parameter `entry` is required to be the content of the request body from clients. The second parameter is the `x-token` we're expecting from the request. This token is used authorize the request. The reason behind this is POST method usually modify our data, so we want to filter out all the unauthorized requests.
+  - `async def create_fact(entry: Fact, x_token: str = Header(...)) -> Fact:` The first parameter `entry` is required to be the content of the request body from clients. The second parameter is the `x-token` we're expecting from the request. This token is used to authorize the request. The reason behind this is POST method is used to modify our data, so we want to filter out all the unauthorized requests.
   - We then check if the passing token is valid. If not, we raise an exception to notify the client side.
     ```python
     if x_token != SECRET_TOKEN:
